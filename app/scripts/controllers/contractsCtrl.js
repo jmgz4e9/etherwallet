@@ -150,11 +150,15 @@ var contractsCtrl = function($scope, $sce, walletService) {
         var typeName = ethUtil.solidityUtils.extractTypeName(fullFuncName);
         var types = typeName.split(',');
         types = types[0] == "" ? [] : types;
-        var values = [];
+        var values = [], value;
         for (var i in curFunc.inputs) {
             if (curFunc.inputs[i].value) {
-                if (curFunc.inputs[i].type.indexOf('[') !== -1 && curFunc.inputs[i].type.indexOf(']') !== -1) values.push(curFunc.inputs[i].value.split(','));
-                else values.push(curFunc.inputs[i].value);
+                if (curFunc.inputs[i].type.indexOf('[') !== -1 && curFunc.inputs[i].type.indexOf(']') !== -1) {
+                    value = curFunc.inputs[i].value;
+                    value = value.replace(/\b/g, '"');
+                    value = JSON.parse("[" + value + "]");
+                    values.push(value);
+                } else values.push(curFunc.inputs[i].value);
             } else values.push('');
         }
         return '0x' + funcSig + ethUtil.solidityCoder.encodeParams(types, values);
